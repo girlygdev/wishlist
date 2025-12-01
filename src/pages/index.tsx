@@ -16,7 +16,7 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from '@/components/ui/select';
-import { Plus } from 'lucide-react';
+import { Loader, Plus } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import {
 	FloatingStar,
@@ -37,19 +37,15 @@ const Index = () => {
 	const [editingItem, setEditingItem] = useState<WishlistItem | undefined>();
 	const { toast } = useToast();
 
+	const [isLoading, setIsLoading] = useState(true);
 	const [wishlist, setWishlist] = useState([]);
 
 	useEffect(() => {
-		fetchWishlists().then(setWishlist).catch(console.error);
+		fetchWishlists().then((data) => {
+			setWishlist(data)
+			setIsLoading(false)
+		}).catch(console.error);
 	}, []);
-
-	useEffect(() => {
-		console.log(wishlist)
-	}, [wishlist]);
-
-	useEffect(() => {
-		localStorage.setItem(STORAGE_KEY, JSON.stringify(wishlist));
-	}, [wishlist]);
 
 	const handleAddWish = async (
 		title: string,
@@ -147,6 +143,17 @@ const Index = () => {
 	const userItemCount = currentAvatar
 		? wishlist.filter((item) => item.avatar === currentAvatar).length
 		: 0;
+
+	if (isLoading) {
+		return (
+			<div className='min-h-screen flex justify-center items-center bg-teal-900'>
+				<div className="flex flex-col justify-center items-center gap-2">
+					<Loader className='animate-spin text-white h-50' />
+					<span className="text-muted text-sm">loading wishes...</span>
+				</div>
+			</div>
+		)
+	}
 
 	return (
 		<div className='min-h-screen bg-teal-900'>
